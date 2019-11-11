@@ -1,15 +1,14 @@
+# 图像处理
 import numpy as np
 import queue
 from tqdm import tqdm
 import cv2
 import os
-def getListFiles(path):
-    ret = []
-    for root, dirs, files in os.walk(path):  
-        for filespath in files:
-            ret.append(os.path.join(root,filespath)) 
-    return ret
+from tqdm import tqdm
+import pickle
+#连通域算法进行图片切割
 
+# 获取图片中各个小分割图像的坐标范围，data代表着待分割图像的灰度值矩阵，n_lines是表示分割图像中符号的行数
 def get_x_y_cuts(data, n_lines=1):
     w, h = data.shape
     visited = set()
@@ -63,11 +62,17 @@ def get_x_y_cuts(data, n_lines=1):
         cuts = new_cuts
     return cuts
 
+# 获取图像中的各个小分割图像的函数，它可以以数据的形式返回，也可以将之以图像的形式保存到磁盘
+# image代表着带分割图像；dir则是图像保存的目的路径
+# is_data表示image是灰度值矩阵还是一个文件名；n_lines表示分割图像中符号的行数
+# data_needed是表示是否需要以数据的形式返回图像的数据集；count是为了方便统计分割符号数量的一个parameter，可忽略
 def get_image_cuts(image, dir=None, is_data=False, n_lines=1, data_needed=False, count=0):
     if is_data:
         data = image
     else:
+        # 灰度处理
         data = cv2.imread(image, 2)
+        # 获得坐标范围
     cuts = get_x_y_cuts(data, n_lines=n_lines)
     image_cuts = None
     for i, item in enumerate(cuts):
@@ -90,26 +95,15 @@ def get_image_cuts(image, dir=None, is_data=False, n_lines=1, data_needed=False,
         return image_cuts
     return count
 
+# 获得新数据集的图像和标签
 def get_images_labels():
-    operators = ['plus', 'sub', 'mul', 'div', '(', ')']
     images = None
     labels = None
-    for i, op in enumerate(operators):
-        image_file_list = getListFiles('./cfs/' + op + '/')
-        print('Loading the ' + op + ' operator...')
-        for filename in tqdm(image_file_list):
-            image = cv2.imread(filename, 2)
-            if image.shape != (28, 28):
-                image = cv2.resize(image, (28, 28))
-            image = np.resize(image, (1, 28 * 28))
-            image = (255 - image) / 255
-            label = np.zeros((1, 10 + len(operators)))
-            label[0][10 + i] = 1
-            if images is None:
-                images = image
-                labels = label
-            else:
-                images = np.r_[images, image]
-                labels = np.r_[labels, label]
+    pickle_images = open('../data/images', 'rb')
+    pickle_labels = open('../data/labels', 'rb')
+    images = pickle.load(pickle_images)
+    labels = pickle.load(pickle_labels)
+    pickle_images.close()
+    pickle_labels.close()
     return images, labels
 
