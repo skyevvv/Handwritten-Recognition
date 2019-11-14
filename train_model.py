@@ -1,6 +1,6 @@
 from cnn_model import *
+import sys
 import tensorflow as tf
-
 
 tf.app.flags.DEFINE_integer(
     'batch_size',
@@ -31,7 +31,7 @@ tf.app.flags.DEFINE_float(
 )
 tf.app.flags.DEFINE_string(
     'model_dir',
-    'C:\static\model',
+    'F:\HandWrinting\ms-master\model',
     '模型保存的目录'
 )
 tf.app.flags.DEFINE_string(
@@ -43,11 +43,10 @@ FLAGS = tf.app.flags.FLAGS
 
 def main(_):
     my_model = model(batch_size=FLAGS.batch_size, hidden_size=FLAGS.hidden_size)
-    # 有问题
-    my_model.train_model(EPOCH=FLAGS.EPOCH, learning_rate=FLAGS.learning_rate,regular_coef=FLAGS.regular_coef, model_dir=FLAGS.model_dir, model_name=FLAGS.model_name)
+    my_model.train_model(EPOCH=FLAGS.EPOCH, learning_rate=FLAGS.learning_rate,
+                         regular_coef=FLAGS.regular_coef, model_dir=FLAGS.model_dir, model_name=FLAGS.model_name)
     
 if __name__ == '__main__':
     np.random.seed(0)
     tf.set_random_seed(0)
-    # 有问题
     tf.app.run()
