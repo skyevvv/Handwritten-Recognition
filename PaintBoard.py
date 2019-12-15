@@ -91,4 +91,3 @@ class PaintBoard(QWidget):
         
     def mouseReleaseEvent(self, mouseEvent):
         self.__IsEmpty = False #画板不再为空
-        
