@@ -1,0 +1,22 @@
+ $(function () {
+            $("#submit").click(function (event) {
+                var box = document.getElementById('box');
+                var context = box.getContext('2d');
+                var imgData = context.getImageData(0, 0, box.width, box.height).data;
+               print("imgData=",imgData);
+                $.post('get_result', {"img_data": imgData.toLocaleString()}, function (json, textStatus) {
+                     {#$("#result").text(json["status"])#}
+                     var t =new Date();
+                     var year = t.getFullYear();
+                     var month = t.getMonth();
+                     var day = t.getDate();
+                     var week = t.getDay();
+                     var arr = new Array("星期日","星期一","星期二","星期三","星期四","星期五","星期六");
+                     var hour = t.getHours();
+                     var minute = t.getMinutes();
+                     var second = t.getSeconds();
+                     var showtime = year+"/"+month+"/"+day+" "+arr[week]+" "+hour+((minute<10)?":0":":")+minute+((second<10)?":0":":")+second+((hour>12)?".pm":".am");
+                    $("#result").append("<p>" + json["status"] + showtime + "<\p>");
+                });
+            })
+        });
